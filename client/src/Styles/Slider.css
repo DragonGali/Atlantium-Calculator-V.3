@@ -1,0 +1,100 @@
+/* Range Slider Container */
+.range-slider-container {
+  position: relative;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  aspect-ratio: 2.25 / 1;
+}
+
+
+/* Value Display Box - Now editable input */
+.range-value-display {
+  width: 100%;
+  height: 100%;
+  color: var(--text);
+  text-align: center;
+  border-radius: 0.3em;
+  background: var(--white);
+  font-family: 'Inter-Light';
+  font-size: var(--font-regular);
+  font-weight: bold;
+  border: solid var(--primary) 0.1rem;
+  box-sizing: border-box;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Range Slider Input */
+.range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 17%;
+  margin-top: -3%;
+  border-radius: 0.5em;
+  background: var(--grey-blue);
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+
+/* Webkit Browsers (Chrome, Safari, Edge) */
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50em;
+  background: var(--highlight);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+.range-slider::-webkit-slider-thumb:hover,
+.range-slider:active::-webkit-slider-thumb {
+  background: var(--slider-hover);
+}
+
+/* Firefox */
+.range-slider::-moz-range-thumb {
+  width: 0.6em;
+  height: 0.6em;
+  border: 0;
+  border-radius: 50em;
+  background: var(--highlight);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+.range-slider::-moz-range-thumb:hover,
+.range-slider:active::-moz-range-thumb {
+  background: var(--slider-hover);
+}
+
+.range-slider::-moz-range-track {
+  background: var(--grey-blue);
+  border: 0;
+  height: 1%;
+  border-radius: 0.5em;
+}
+
+/* Focus State */
+.range-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 0.2em var(--white), 
+              0 0 0 0.3em var(--slider-hover);
+}
+
+/* Remove Focus Outline on Firefox */
+.range-slider::-moz-focus-inner,
+.range-slider::-moz-focus-outer {
+  border: 0;
+}
+

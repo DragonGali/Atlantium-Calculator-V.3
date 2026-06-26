@@ -1,0 +1,68 @@
+/* I must use this font for the checkbox to look right */
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css");
+
+* {
+  font-family: 'Inter-Light';
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.check-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+.check-box .label-text {
+  color: var(--text);
+  font-size: var(--font-checkbox);
+  white-space: nowrap;
+}
+
+.check-box .label-text:before {
+  display: none;
+}
+
+.check-box label {
+  cursor: pointer;
+  color: var(--primary);
+  display: flex; /* Change from block to flex */
+  align-items: center; /* Center align items */
+}
+
+.check-box [type="checkbox"] + .label-text:before {
+  content: "\f096";
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-size: var(--checkbox-size);
+  display: inline-block;
+  margin-right: 5%;
+  color: var(--primary);
+}
+
+input[type="checkbox"]:checked + .label-text:before {
+  content: "\f14a";
+  color: var(--highlight);
+  animation: tick 150ms ease-in;
+}
+
+input[type="checkbox"]:disabled + .label-text:before {
+  content: "\f0c8";
+} 
+
+
+@keyframes tick {
+  0% {
+    transform: scale(0);
+  }
+  90% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+

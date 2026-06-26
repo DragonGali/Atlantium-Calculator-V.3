@@ -1,0 +1,23 @@
+.progress-bar-container {
+  width: 20%;
+  height: 100%;
+  position: relative;
+  border: 0.1em solid var(--primary);
+  padding: 0.15em; /*Gap between the fill and the walls*/
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--highlight);
+  transition: all 0.3s ease-out;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

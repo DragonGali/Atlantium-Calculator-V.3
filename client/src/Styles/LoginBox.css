@@ -1,0 +1,121 @@
+.LoginBox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The overlay */
+.LoginBox::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(138, 152, 169, 0.6);
+  z-index: 0;
+}
+
+.LoginBox .container {
+  position: relative;
+  z-index: 9;
+  background: var(--white);
+  width: clamp(300px, 35vw, 550px);
+  height: clamp(200px, 40vh, 500px);
+  border: 0.4em solid var(--text);
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(8px, 1.5vh, 1.5vh);
+  padding: clamp(15px, 2vh, 2vh);
+}
+
+.LoginBox .title {
+  font-size: clamp(14px, 1.2vw, 20px);
+  font-weight: bold;
+  color: var(--text);
+  margin-top: clamp(5px, 2vh, 2vh);
+  transition: color 0.3s ease;
+}
+
+.LoginBox .title.error {
+  color: #ff4444;
+}
+
+.LoginBox .input-group {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3%
+}
+
+.LoginBox .input-label {
+  font-size: var(--font-regular);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.LoginBox .type-bar {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 10 / 1;
+  border: 0.15em solid rgba(89, 121, 145, 0.5);
+  border-radius: 0.5em;
+  box-shadow: 0.1em 0.1em 0em 0em rgba(89, 121, 145, 0.5);
+  display: flex;
+  align-items: center;
+  padding: 0 1em;
+  cursor: text;
+  font-family: monospace;
+  font-size: var(--font-regular);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  align-self: center;
+}
+
+.LoginBox .type-bar.active {
+  border-color: rgba(89, 121, 145, 0.8);
+  box-shadow: 0.15em 0.15em 0em 0em rgba(89, 121, 145, 0.8);
+}
+
+.input-text {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  letter-spacing: 0.1em;
+}
+
+.cursor {
+  color: black;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-left: 2px;
+  animation: none; /* We handle blinking with React state */
+}
+
+
+.login-button {
+  margin-top: 5%;
+  width: 30%;
+  height: clamp(35px, 5vh, 50px);
+  border: 0.15em solid var(--primary);
+  border-radius: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-button p {
+  font-size: clamp(11px, 1vw, 16px);
+  margin: 0;
+}
+
+.login-button:hover {
+  cursor: pointer;
+  background-color: var(--background);
+}

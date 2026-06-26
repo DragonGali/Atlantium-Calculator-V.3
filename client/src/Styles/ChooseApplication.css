@@ -1,0 +1,72 @@
+.ChooseApplication .wrapper {
+  aspect-ratio: 8 / 2.8;
+}
+
+.ChooseApplication .title-box {
+  width: 60%;
+  margin-bottom: -3%;
+}
+
+
+.radio-buttons {
+  position: absolute;
+  left: 3%;
+  overflow: hidden;
+  height: 90%;
+}
+
+/* Forms */
+.ChooseApplication form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  margin-top: 1%;
+  justify-content: space-around;
+}
+
+
+label {
+  display: flex;
+  cursor: pointer;
+  font-family: "Inter-Light";
+  position: relative;
+  font-size: var(--font-regular);
+  color: var(--text);
+}
+
+.ChooseApplication label input:checked + span:before {
+  box-shadow: inset 0 0 0 0.45em var(--highlight);
+}
+
+/* Radio button visual */
+.ChooseApplication label span {
+  display: flex;
+  align-items: center;
+  border-radius: 99vw;
+  white-space: nowrap;
+}
+
+.ChooseApplication label:hover {
+  border-radius: 5em;
+  background-color: var(--grey-blue);
+}
+
+.ChooseApplication label span:before {
+  display: flex;
+  gap: 1%;
+  width: 1.6em;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin-right: 0.7em;
+  content: "";
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.2em var(--primary);
+  transition: box-shadow 0.25s ease;
+}
+
+.ChooseApplication form hr {
+  border: none;
+  border-top: 0.15em solid var(--primary);
+  width: 100%;
+}

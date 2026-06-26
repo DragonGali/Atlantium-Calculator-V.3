@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  server:
+    build: ./server
+    container_name: calculator-server
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"   # optional external access
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    container_name: calculator-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: unless-stopped

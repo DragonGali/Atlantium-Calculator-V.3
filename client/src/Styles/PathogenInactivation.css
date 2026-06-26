@@ -1,0 +1,123 @@
+/* Title box - outside wrapper */
+.PathogenInactivation .title-box {
+  width: 70%;
+}
+
+
+/* Main wrapper container */
+.PathogenInactivation .wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  aspect-ratio: 7 / 2;
+  width: 100%;
+}
+
+/* First vertical container - main content area (80% of wrapper) */
+.PathogenInactivation .vertical-container:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5%;
+  height: 80%;
+  width: 78%;
+  border-radius: 0.8em;
+  box-sizing: border-box;
+  margin-top: 2.5%;
+}
+
+/* Second vertical container - reset button area */
+.PathogenInactivation .vertical-container:last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5%;
+  height: 80%;
+  width: 18%;
+  margin-top: 2.5%;
+  box-sizing: border-box;
+}
+
+/* Horizontal containers within first vertical container */
+.PathogenInactivation .horizontal-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  width: 100%;
+  height: 40%;
+  align-items: center;
+}
+
+/* Type selection box */
+.PathogenInactivation .type-box {
+  display: flex;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+}
+
+.PathogenInactivation .type-box p {
+  font-size: var(--font-regular);
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Input field styling */
+.PathogenInactivation .simple-input {
+  width: 26%;
+}
+
+.PathogenInactivation .simple-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2em rgba(var(--primary-rgb), 0.2);
+}
+
+/* Value display box */
+.PathogenInactivation .value-box {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--text);
+  font-family: 'Inter-Medium';
+  font-weight: 600;
+  border: 0.2em solid var(--primary);
+  width: 48%;
+  height: 100%;
+  font-size: var(--font-regular);
+  border-radius: 0.5em;
+  box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.1);
+}
+
+/* Reset button styling */
+.PathogenInactivation .reset-button {
+  border: 0.15em solid var(--primary);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-regular);
+  font-family: 'Inter-Medium';
+  background-color: var(--grey-blue);
+  border-radius: 0.5em;
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1.3 / 1;
+  cursor: pointer;
+}
+
+.PathogenInactivation .reset-button:hover {
+  filter: brightness(0.95);
+}
+
+/* Expected LI text styling */
+.PathogenInactivation .expected-li-text {
+  font-size: var(--font-regular);
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'Inter-Medium';
+  line-height: 1.4;
+  white-space: nowrap;
+}

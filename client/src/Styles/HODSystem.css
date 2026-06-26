@@ -1,0 +1,102 @@
+.HODSystem {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+
+.HODSystem .wrapper {
+  aspect-ratio: auto;
+  height: 100%;
+}
+
+.HODSystem .title-box {
+  flex: 0 0 1;
+  width: 60%;
+  margin-bottom: -3%;
+}
+
+.HODSystem .horizontal-container {
+  display: flex;
+  flex-flow: row;
+  gap: 0.5em;
+  width: 90%;
+  margin-left: 5%;
+  height: auto;
+  aspect-ratio: 10 / 1;
+}
+
+.HODSystem .vertical-container {
+  display: flex;
+  flex-flow: column;
+  margin-top: 5%;
+  gap: 5%;
+  height: 92%;
+  width: 100%;
+}
+
+.HODSystem .type-box {
+  width: 32%;
+  height: 100%;
+  flex-shrink: 0; /* Prevents shrinking */
+  text-align: left; /* Consistent text alignment */
+  display: flex;
+  align-items: center; /* Vertically center the text */
+}
+
+.HODSystem .type-box.small {
+  width: 29%;
+
+}
+
+.HODSystem .button {
+  background-color: var(--background);
+  font-size: var(--font-regular);
+  font-weight: bold;
+  font-family: 'Inter-Medium';
+  border: clamp(0.3em, 0.3em, 3px) solid var(--primary);
+  color: var(--blue-text);
+  border-radius: 0.7em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  height: 100%;
+}
+
+
+.HODSystem .but-0 {
+  flex: 1;
+}
+
+.HODSystem .but-1 {
+  flex: 1.1;
+}
+
+.HODSystem .but-2 {
+  flex: 0.9;
+}
+
+
+
+.HODSystem .button p {
+  white-space: nowrap;
+}
+
+.HODSystem .button.IsPressed {
+  background-color: var(--highlight);
+  color: var(--white);
+}
+
+.HODSystem .button.NotPressed:hover {
+  filter: brightness(1.1);
+}
+
+/* Specific styling for the checkbox container to align properly */
+.HODSystem .check-box {
+  width: 29%;
+  flex-shrink: 0;
+}

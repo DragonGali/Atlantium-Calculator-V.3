@@ -1,0 +1,101 @@
+/* Tree view styles */
+.tree-view {
+  font-size: var(--font-regular);
+  position: relative;
+}
+
+.tree-item {
+  position: relative;
+}
+
+.tree-item-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.tree-item-line-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.vertical-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.1em;
+  border-left: 0.1em dashed var(--primary);
+}
+
+.vertical-line.hidden {
+  display: none;
+}
+
+.horizontal-line {
+  position: absolute;
+  top: 50%;
+  width: 5%;
+  border-top: 0.1em dashed var(--primary);
+}
+
+.tree-item-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 1em;
+  border-radius: 0.5em;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 1;
+}
+
+.tree-item-wrapper:hover {
+  background-color: var(--tree-hover);
+}
+
+.tree-item-content.selected .tree-item-wrapper {
+  background-color: var(--tree-select);
+  color: var(--highlight);
+}
+
+.expand-indicator {
+  margin-right: 0.5em;
+  font-size: 1em;
+  transition: transform 0.2s ease;
+  color: #6c757d;
+  text-align: center;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1; /* keeps square shape */
+}
+
+.expand-indicator.expanded {
+  transform: rotate(90deg);
+}
+
+.tree-label {
+  flex: 1;
+  user-select: none;
+}
+
+.tree-item-content.expanded .tree-label {
+  font-weight: 600;
+}
+
+/* Hide lines for trees without connected class */
+.tree-view:not(.connected) .vertical-line,
+.tree-view:not(.connected) .horizontal-line {
+  display: none;
+}
+
+/* Accessibility improvements */
+.tree-item-wrapper:focus {
+  outline: 0.2em solid var(--highlight);
+  outline-offset: -0.2em;
+}
+
+
+

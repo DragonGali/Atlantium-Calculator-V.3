@@ -1,0 +1,60 @@
+ .Dichlorination {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.Dichlorination .title-box {
+    flex: 0 0 1;
+    width: 70%;
+}
+
+.Dichlorination .wrapper {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+
+.Dichlorination .vertical-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5%;
+  height: 80%;
+  width: 95%;
+  margin-top: 2.5%;
+  box-sizing: border-box;
+}
+
+.Dichlorination .horizontal-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  width: 100%;
+  height: 40%;
+  align-items: center;
+}
+
+.Dichlorination .type-box {
+    width: 30%;
+    height: 100%;
+}
+
+.Dichlorination .value-box {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text);
+    font-family: 'Inter-Medium';
+    font-weight: 600;
+    border-style: solid;
+    border-color: var(--primary);
+    border-width: 0.2em;
+    width: 20%;
+    height: 100%;
+    font-size: var(--font-regular);
+} 

@@ -1,0 +1,49 @@
+.PlotFigures {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+.PlotFigures .title-box {
+  flex: 0 0 1;
+  width: 60%;
+  margin-bottom: -3%;
+}
+
+.PlotFigures .wrapper {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+.PlotFigures .vertical-container {
+  display: flex;
+  flex-flow: column;
+  margin-top: 5%;
+  gap: 5%;
+  height: 90%;
+  width: 90%;
+}
+
+.PlotFigures .button {
+    background-color: var(--white);
+    border: solid var(--primary) 0.2em;
+    border-radius: 2em;
+    font-size: var(--font-regular);
+    font-weight: bold;
+    font-family: 'Inter-Medium';
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    white-space: nowrap;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    aspect-ratio: 10 / 1.2;
+}
+
+.PlotFigures .button:hover {
+    filter: brightness(1.3);
+} 

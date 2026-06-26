@@ -1,0 +1,11 @@
+/* Simple Chart Component Styles */
+
+.chart-container {
+  width: 95%;
+  margin-left: 2.5%;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

@@ -1,0 +1,67 @@
+.Results .wrapper {
+    overflow: visible;
+    aspect-ratio: 8 / 4.5;
+}
+
+.Results .title-box {
+    width: 50%;
+}
+
+.Results .vertical-container {
+  display: flex;
+  flex-flow: column;
+  margin-top: 1%;
+  gap: 2%;
+  height: 85%;
+  width: 100%;
+}
+
+.Results .type-box {
+    width: auto;
+    height: 100%;
+    flex-shrink: 0; /* Prevents shrinking */
+    display: flex;
+    align-items: center; /* Vertically center the text */
+    white-space: nowrap; /* Prevent text wrapping to the next line */
+    aspect-ratio: 5 / 1;
+    font-size: var(--results-type-box);
+}
+
+.Results .small {
+    width: 25%;
+}
+
+.Results .horizontal-container {
+  display: flex;
+  flex-flow: row;
+  gap: 2%;
+  width: 95%;
+  height: auto;
+  margin-left: 2.5%;
+  aspect-ratio: 9 / 1;
+}
+
+.Results .value-box {
+    background-color: var(--grey-blue);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text);
+    font-family: 'Inter-Light';
+    font-weight: bold;
+    border-radius: 0.5em;
+    border: solid 0.15em var(--primary);
+    width: 60%;
+    font-size: var(--font-regular);
+}
+
+.Results .line {
+    border: none;
+    background-color: var(--primary);
+    margin-top: 1.5%;
+    margin-bottom: 1.5%;
+    width: 94%;
+    height: 3%;
+    margin-left: 3%;
+}
