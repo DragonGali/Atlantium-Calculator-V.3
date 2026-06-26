@@ -11,8 +11,34 @@
   padding-bottom: 4%;
 }
 
+/* Banner container with user info overlay */
+.banner-container {
+  position: relative;
+  width: 100%;
+}
+
 #atlantium-img {
   width: 100%;
+}
+
+/* User info positioned over top right of banner */
+.user-info-banner {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: #546e7a;
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.user-info-banner strong {
+  color: #5c6bc0;
+  font-weight: 600;
 }
 
 .systems-container {
@@ -62,7 +88,7 @@
 
 /* Pathogen type header cell */
 .app-pathogen-type-header {
-    flex: 0 0 22%;
+    flex: 0 0 21%;
     text-align: left;
     border-right: 0.15em solid var(--primary);
     height: 100%;
@@ -71,7 +97,7 @@
 
 /* Log header cells */
 .app-log-header {
-    flex: 1;
+    flex: 0 0 7%;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -103,9 +129,19 @@
 }
 
 
-.footer #creator-names {
+.footer #creator-names{
   margin-left: 0.5%;
   font-style: italic;
+}
+
+.footer #creator-names a {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.footer #creator-names a:hover {
+  color: var(--highlight);
+  text-decoration: underline;
 }
 
 .footer #version{

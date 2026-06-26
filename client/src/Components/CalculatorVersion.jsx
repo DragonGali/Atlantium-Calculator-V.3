@@ -2,49 +2,58 @@
  * CalculatorVersion.jsx
  * 
  * Lets the user choose for what purpose they are using the app.
- * If the "Developer" option is selected, it prompts for a password.
+ * If the "Developer" option is selected:
+ *   - Developer/Admin users: Immediately activate physics mode (no password)
+ *   - Marketing users: Prompts for a password
  */
 
-import { useState, useEffect, Fragment} from 'react'
 import '../Styles/CalculatorVersion.css';
 import data from "../data";
+import React from 'react';
+import Tooltip from '../Components/Tooltip';
+import tooltips from '../tooltips';
 
-import PasswordBox from './PasswordBox';
-
-const CalculatorVersion = ({unlockAll, openPasswordBox}) => {
-  
-  // Logs unlockAll changes (mainly for debugging)
-  useEffect(() => {
-  }, [unlockAll])
+const CalculatorVersion = ({openPasswordBox, updateState, appState}) => {
 
   // Handles button actions: open password box for Developer, or lock features
   const handleClick = (button) => {
-    if (button === data.CalculatorVersionButtons[0]) { 
-      openPasswordBox();
-    } 
-    else if (button === data.CalculatorVersionButtons[1]) { 
-      unlockAll(false);
+    if (button === data.CalculatorVersionButtons[0]) {  // Developer
+      // Check if user is Developer or Admin - they don't need password
+      const userRole = appState?.role;
+      if (userRole === 'Developer' || userRole === 'Admin') {
+        // Directly activate physics mode without password
+        updateState({ calculatorMode: 'Developer', activatePhysicsMode: true });
+      } else {
+        // Marketing users need password
+        openPasswordBox();
+      }
+    }
+    else if (button === data.CalculatorVersionButtons[1]) {  // Standard
+      // Set both calculatorMode and let App.jsx derive unlockAll from it
+      updateState({ calculatorMode: 'Marketing' });
     }
   };
    
   return ( 
     <div className="CalculatorVersion">
       <div className="title-box">
-        <p>Calculator Version</p>
+        <p>Developer Options</p>
       </div>
-      <div className="wrapper">
-        <div className='horizontal-container'>
-          {data.CalculatorVersionButtons.map((button, index) => (
-            <div 
-              className='button' 
-              key={index} 
-              onClick={() => {handleClick(button)}}
-            >
-              <p>{button}</p>
+        <Tooltip text={tooltips.version} delay={1000}>
+          <div className="wrapper">
+            <div className='horizontal-container'>
+              {data.CalculatorVersionButtons.map((button, index) => (
+                <div
+                  className='button'
+                  key={index}
+                  onClick={() => {handleClick(button)}}
+                >
+                  <p>{button}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </Tooltip>
     </div>
   )
 }

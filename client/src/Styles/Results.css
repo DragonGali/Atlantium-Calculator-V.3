@@ -27,6 +27,7 @@
     font-size: var(--results-type-box);
 }
 
+
 .Results .small {
     width: 25%;
 }
@@ -56,6 +57,28 @@
     font-size: var(--font-regular);
 }
 
+/* Flash animation when results update */
+.Results .value-box.flashing {
+    /* animation lasts 0.5s and returns to normal */
+    animation: resultsFlash 0.5s ease;
+}
+
+@keyframes resultsFlash {
+  0% {
+    background-color: var(--grey-blue);
+    border-color: var(--primary);
+  }
+  50% {
+    /* lighter background, darker border at midpoint */
+    background-color: #f3fbff; /* light highlight */
+    border-color: #0b5fa5; /* darker primary-like color */
+  }
+  100% {
+    background-color: var(--grey-blue);
+    border-color: var(--primary);
+  }
+}
+
 .Results .line {
     border: none;
     background-color: var(--primary);
@@ -65,3 +88,20 @@
     height: 3%;
     margin-left: 3%;
 }
+
+/* RED BACKGROUND for invalid RED calculation results */
+.Results .value-box.invalid-result {
+    background-color: rgba(255, 100, 100, 0.4) !important;
+    border-color: rgba(200, 50, 50, 0.6) !important;
+    animation: invalid-result-pulse 2s ease-in-out infinite;
+}
+
+@keyframes invalid-result-pulse {
+    0%, 100% {
+        background-color: rgba(255, 100, 100, 0.35);
+    }
+    50% {
+        background-color: rgba(255, 100, 100, 0.55);
+    }
+}
+

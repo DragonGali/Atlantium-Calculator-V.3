@@ -1,26 +1,27 @@
 /**
  * PasswordBox.jsx
- * 
+ *
  * A full-screen password input component for developer access.
- * Uses the backend login endpoint with a default "Developer" username.
- * 
+ * Checks password against a hardcoded value from data.js
+ * Independent of user role - anyone can unlock developer features with the correct password.
+ *
  * - Props:
  *   - `onClose`: called when the box is closed/cancelled
  *   - `onPasswordCorrect`: called when the correct password is entered
- * 
+ *
  * - Features:
  *   - Blinking cursor effect
  *   - Hidden input keeps value synced with custom display
  *   - Shows error message briefly on wrong password
  *   - Supports Enter to submit and Escape to cancel
- *   - Fetches authentication from MongoDB backend
+ *   - Simple client-side password check (no backend authentication)
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import '../Styles/PasswordBox.css';
-import apiService from '../apiService';
+import data from '../data';
 
-const PasswordBox = ({ onClose, onPasswordCorrect, appState, updateState }) => {
+const PasswordBox = ({ onClose, updateState}) => {
   const [password, setPassword] = useState('');
   const [showCursor, setShowCursor] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
@@ -39,7 +40,7 @@ const PasswordBox = ({ onClose, onPasswordCorrect, appState, updateState }) => {
   useEffect(() => inputRef.current?.focus(), []);
 
   const checkPassword = async (value = password) => {
-    if (!value.trim()) {
+    if (!value. trim()) {
       setErrorMessage('Please enter a password');
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
@@ -47,32 +48,17 @@ const PasswordBox = ({ onClose, onPasswordCorrect, appState, updateState }) => {
     }
 
     setIsVerifying(true);
-    
+
     try {
-      // Use the login endpoint with default username
-      const result = await apiService.login(appState.username, value);
-      
-      if (result.success) {
-        // Store user info for later use
-        updateState({"password" : value})
-        
-        onPasswordCorrect?.(true);
+      // Simple hardcoded password check from data.js
+      if (value === data.DeveloperPassword) {
+        // Password is correct - set calculatorMode and activate physics mode
+        // activatePhysicsMode ensures physics ranges are applied even if already in Developer mode
+        updateState?.({ calculatorMode: 'Developer', activatePhysicsMode: true });
         onClose?.();
       } else {
-        // Map backend error messages to user-friendly messages
-        let displayError = 'Wrong Password!';
-        
-        if (result.error.includes('Wrong Login Name')) {
-          displayError = 'Developer account not found';
-        } else if (result.error.includes('Wrong Password')) {
-          displayError = 'Wrong Password!';
-        } else if (result.error.includes('Expired')) {
-          displayError = 'Access Expired. Contact Admin.';
-        } else {
-          displayError = result.error;
-        }
-        
-        setErrorMessage(displayError);
+        // Wrong password
+        setErrorMessage('Wrong Password! ');
         setShowError(true);
         setPassword('');
         setTimeout(() => setShowError(false), 3000);
@@ -80,7 +66,7 @@ const PasswordBox = ({ onClose, onPasswordCorrect, appState, updateState }) => {
       }
     } catch (error) {
       console.error('Password verification error:', error);
-      setErrorMessage('Server error. Please try again.');
+      setErrorMessage('Error checking password');
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
     } finally {

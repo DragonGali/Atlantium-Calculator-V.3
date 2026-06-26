@@ -95,8 +95,35 @@
   filter: brightness(1.1);
 }
 
+/* Disabled button state - grayed out for unavailable lamp types */
+.HODSystem .button.Disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.HODSystem .button.Disabled:hover {
+  filter: none;
+  background-color: #e9ecef;
+}
+
 /* Specific styling for the checkbox container to align properly */
 .HODSystem .check-box {
   width: 29%;
   flex-shrink: 0;
 }
+
+/* Hide number input spinner buttons */
+.HODSystem input[type="number"]::-webkit-inner-spin-button,
+.HODSystem input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.HODSystem input[type="number"] {
+  -moz-appearance: textfield;
+}
+

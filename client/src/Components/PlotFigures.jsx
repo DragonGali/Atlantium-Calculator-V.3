@@ -13,16 +13,24 @@
  */
 
 
-import { useState, useEffect, Fragment} from 'react'
+import { useState } from 'react'
 import '../Styles/PlotFigures.css';
-import data from "../data";
+import React from 'react';
+import Tooltip from '../Components/Tooltip';
+import tooltips from '../tooltips';
 
-function PlotFigures ({unlockAll, openChart}) {
+function PlotFigures ({unlockAll, openChart, updateState, getChartSensitivity}) {
 
-  const [pressedButton, setPressedButton] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    const handleClick = (button) => {
-    setPressedButton(button);
+  const handleClick = async (button) => {
+    setLoading(true);
+    updateState({chartType: button});
+
+    // Wait for chart data to be fetched before opening window
+    await getChartSensitivity(button);
+
+    setLoading(false);
     openChart();
   }
    
@@ -33,11 +41,21 @@ function PlotFigures ({unlockAll, openChart}) {
     </div>
     <div className="wrapper">
         <div className='vertical-container'>
-                {data.PlotFiguresButtons.map((button, index) => (
-                    <div className='button' key={index} onClick={() => handleClick(button)}>
-                            <p>{button}</p>
-                    </div>
-                ))}
+            <Tooltip text={tooltips.plotREDUVT} delay={1000}>
+                <div className={`button ${loading ? 'disabled' : ''}`} onClick={() => !loading && handleClick("uvt")}>
+                        <p>{loading ? 'Loading...' : 'Plot RED = f(UVT)'}</p>
+                </div>
+            </Tooltip>
+            <Tooltip text={tooltips.plotREDFlow} delay={1000}>
+                <div className={`button ${loading ? 'disabled' : ''}`} onClick={() => !loading && handleClick("flow")}>
+                        <p>{loading ? 'Loading...' : 'Plot RED = f(Flow)'}</p>
+                </div>
+            </Tooltip>
+            <Tooltip text={tooltips.plotREDDrive} delay={1000}>
+                <div className={`button ${loading ? 'disabled' : ''}`} onClick={() => !loading && handleClick("drive")}>
+                        <p>{loading ? 'Loading...' : 'Plot RED = f(Rel.Drive)'}</p>
+                </div>
+            </Tooltip>
             </div>
     </div>
     

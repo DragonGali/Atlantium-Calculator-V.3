@@ -1,36 +1,30 @@
-/**
- * TableView.jsx
- *
- * Displays tabular data dynamically with selectable rows.
- * Used in PathogenReduction and FullTable views.
- *
- * Props:
- * - data: array of objects, each representing a row; keys other than "name" are shown as dose values
- * - isFullTable: boolean to adjust layout (default false)
- *
- * State:
- * - selectedRowIndex: highlights the row clicked by the user
- */
-
-
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import "../Styles/TableView.css"
 
 const TableView = ({ data, isFullTable = false, appState, updateState}) => {
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
+  // Sync selectedRowIndex with appState.Pathogen whenever appState changes
+  useEffect(() => {
+    if (appState?.Pathogen) {
+      const index = data.findIndex(row => row.name === appState.Pathogen);
+      setSelectedRowIndex(index >= 0 ? index : null);
+    } else {
+      setSelectedRowIndex(null);
+    }
+  }, [appState?.Pathogen, data]);
+
   // Figure out which keys are dose values (exclude "name")
-  // So that the component will be dynamic and work with any amount of columns.
   const doseKeys = data.length > 0 
     ? Object.keys(data[0]).filter((key) => key !== "name")
     : [];
 
-
-  //Sets a row as selected
+  // Sets a row as selected
   const handleRowClick = (index) => {
     setSelectedRowIndex(index);
     updateState({"Pathogen" : data[index].name});
+    updateState({"manualInput" : false}); // Ensure manualInput is false when selecting
   }
 
   return (
@@ -56,6 +50,5 @@ const TableView = ({ data, isFullTable = false, appState, updateState}) => {
     </div>
   );
 };
-
 
 export default TableView;

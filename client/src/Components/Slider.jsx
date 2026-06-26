@@ -1,60 +1,64 @@
-/**
- * Slider.jsx
- *
- * Custom slider with an editable numeric input.
- *
- * Props:
- * - min: minimum value (required)
- * - max: maximum value (required)
- * - step: step size (default 1)
- * - value: current value (required, controlled externally)
- * - onChange: callback(newValue) -> parent handles state update
- *
- * Features:
- * - Fully controlled component (no internal initial value)
- * - Slider and input are synchronized
- * - Input only allows numeric values
- * - Clamps input to min/max
- * - Editable input clears on focus for easy typing
- */
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../Styles/Slider.css';
 
-const Slider = ({ 
-  min, 
-  max, 
-  step = 1, 
-  value, 
-  onChange
-}) => {
-  const [inputValue, setInputValue] = useState(value?.toString() || '');
-  const [isEditing, setIsEditing] = useState(false);
+const Slider = ({
+                  min,
+                  max,
+                  step = 1,
+                  value,
+                  multiplyer = 1,
+                  onChange,
+                  isOutOfRange = false  // NEW PROP
+                }) => {
+  // Convert base value to display value
+  const displayValue = value * multiplyer;
+  const displayMin = min * multiplyer;
+  const displayMax = max * multiplyer;
+  const displayStep = step * multiplyer;
 
-  // Sync inputValue with incoming value prop changes (e.g., from server updates)
+  const [inputValue, setInputValue] = useState(displayValue?. toString() || '');
+  const [isEditing, setIsEditing] = useState(false);
+  const prevMinMaxRef = useRef({ min, max });
+
+  // Clamp when min/max changes (operates on base values)
+  useEffect(() => {
+    const prevMin = prevMinMaxRef.current.min;
+    const prevMax = prevMinMaxRef.current. max;
+
+    if (prevMin !== min || prevMax !== max) {
+      prevMinMaxRef.current = { min, max };
+
+      if (value !== undefined && value !== null) {
+        let clampedValue = Math.min(Math.max(value, min), max);
+        if (clampedValue !== value) {
+          onChange(clampedValue);
+        }
+      }
+    }
+  }, [min, max, value, onChange]);
+
+  // Sync inputValue with external value when not editing (display units)
   useEffect(() => {
     if (!isEditing && value !== undefined && value !== null) {
-      setInputValue(value.toString());
+      setInputValue((value * multiplyer).toString());
     }
-  }, [value, isEditing]);
+  }, [value, isEditing, multiplyer]);
 
+  // Slider change:  convert from display units back to base units
   const handleSliderChange = (e) => {
-    const newValue = Number(e.target.value);
-    onChange(newValue);
-    setInputValue(newValue.toString());
+    const displayVal = Number(e.target.value);
+    const baseValue = displayVal / multiplyer;
+    onChange(baseValue);
+    setInputValue(displayVal.toString());
   };
 
   const handleInputKeyPress = (e) => {
-    // Allow digits, one ".", and control keys
-    if (
-      !/[\d.]/.test(e.key) &&
-      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)
-    ) {
+    if (!/[\d.]/.test(e.key) &&
+        ! ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter']. includes(e.key)) {
       e.preventDefault();
     }
 
-    // Prevent typing more than one "."
-    if (e.key === '.' && e.target.value.includes('.')) {
+    if (e.key === '.' && e.target.value. includes('.')) {
       e.preventDefault();
     }
 
@@ -63,58 +67,74 @@ const Slider = ({
     }
   };
 
+  // Input change: validate against display units, convert to base units for onChange
   const handleInputChange = (e) => {
-    const inputVal = e.target.value;
+    const val = e.target.value;
+    if (/^\d*\.?\d*$/.test(val)) {
+      setInputValue(val);
 
-    // Allow empty string, numbers, or decimals like "12.", "12.3"
-    if (/^\d*\.?\d*$/.test(inputVal)) {
-      setInputValue(inputVal);
+      const numericDisplayValue = Number(val);
+      if (val !== '' && numericDisplayValue >= displayMin && numericDisplayValue <= displayMax) {
+        const baseValue = numericDisplayValue / multiplyer;
+        onChange(baseValue);
+      }
     }
   };
 
   const handleInputFocus = () => {
     setIsEditing(true);
-    setInputValue(''); // Clear input for typing
+    setInputValue('');
   };
 
+  // Input blur: clamp to display range, convert to base units
   const handleInputBlur = () => {
     setIsEditing(false);
+
     if (inputValue === '') {
-      setInputValue(value.toString());
+      setInputValue((value * multiplyer).toString());
       return;
     }
 
-    let numericValue = Number(inputValue);
-    if (numericValue > max) numericValue = max;
-    else if (numericValue < min) numericValue = min;
+    let numericDisplayValue = Number(inputValue);
+    if (numericDisplayValue < displayMin) numericDisplayValue = displayMin;
+    if (numericDisplayValue > displayMax) numericDisplayValue = displayMax;
 
-    onChange(numericValue);
-    setInputValue(numericValue.toString());
+    const baseValue = numericDisplayValue / multiplyer;
+    onChange(baseValue);
+    setInputValue(numericDisplayValue.toString());
   };
 
   return (
-    <div className="range-slider-container">
-      {/* Editable numeric input */}
-      <input
-        type="text"
-        value={isEditing ? inputValue : value}
-        onChange={handleInputChange}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        className="range-value-display"
-      />
+      <div className="range-slider-container">
+        {isEditing ? (
+            <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                onKeyDown={handleInputKeyPress}
+                className={`range-value-display ${isOutOfRange ?  'out-of-range' : ''}`}
+                autoFocus
+            />
+        ) : (
+            <div
+                className={`range-value-display ${isOutOfRange ?  'out-of-range' : ''}`}
+                onClick={handleInputFocus}
+            >
+              {parseFloat(displayValue.toFixed(2))}
+            </div>
+        )}
 
-      {/* Range slider */}
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={handleSliderChange}
-        className="range-slider"
-      />
-    </div>
+        <input
+            type="range"
+            min={displayMin}
+            max={displayMax}
+            step={displayStep}
+            value={displayValue}
+            onChange={handleSliderChange}
+            className="range-slider"
+        />
+      </div>
   );
 };
 

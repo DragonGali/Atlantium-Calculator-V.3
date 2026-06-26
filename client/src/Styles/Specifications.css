@@ -66,6 +66,10 @@
     align-items: center;
 }
 
+.Specifications .button p {
+    user-select: none;
+}
+
 
 
 .Specifications .button:hover {

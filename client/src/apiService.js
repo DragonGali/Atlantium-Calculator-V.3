@@ -33,11 +33,34 @@ class APIService {
   }
 
   /**
+   * Get the version of the calculator
+   * GET /version
+   * Returns API server version and RED library version
+   */
+  async getVersion() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/version`);
+      const data = await response.json();
+      return {
+        success: true,
+        api_version: data.api_version,
+        library_version: data.library_version
+      };
+    } catch (error) {
+      console.error('Failed to get version:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
    * User authentication - uses MongoDB backend
    * POST /login
    * 
-   * @param {string} username - The username
-   * @param {string} password - The password
+   * {string} username - The username
+   * {string} password - The password
    */
   async login(username, password) {
     try {
@@ -84,10 +107,21 @@ class APIService {
   /**
    * Get supported systems from backend
    * GET /systems/supported
+   *
+   * @param {string} type - Optional filter for system Type (e.g., "EPA", "Standard")
+   * @param {string} role - User role (e.g., "Marketing", "Developer", "Admin")
+   *                        Marketing users see only production systems
    */
-  async getSupportedSystems() {
+  async getSupportedSystems(type, role) {
     try {
-      const response = await fetch(`${API_BASE_URL}/systems/supported`);
+      const params = new URLSearchParams();
+      if (type) params.append('type', type);
+      if (role) params.append('role', role);
+
+      const queryString = params.toString();
+      const url = `${API_BASE_URL}/systems/supported${queryString ? '?' + queryString : ''}`;
+
+      const response = await fetch(url);
       const data = await response.json();
       return {
         success: true,
@@ -103,28 +137,282 @@ class APIService {
   }
 
   /**
+   * Get lamp info for a specific system
+   * GET /system/{system_type}/lamp
+   *
+   * @param {string} systemType - System identifier (e.g., "RZ104-11")
+   * @returns {Object} Lamp info including power, count, and available types
+   */
+  async getLampInfo(systemType) {
+    try {
+      const url = `${API_BASE_URL}/system/${systemType}/lamp`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to get lamp info');
+      }
+
+      return {
+        success: true,
+        power: data.power,
+        count: data.count,
+        types: data.types || ['Regular']
+      };
+    } catch (error) {
+      console.error('Failed to get lamp info:', error);
+      return {
+        success: false,
+        error: error.message,
+        types: ['Regular']  // Default fallback
+      };
+    }
+  }
+
+  /**
    * Get valid parameter ranges for a specific system
    * GET /system/{system_type}/ranges
-   * 
-   * @param {string} systemType - e.g., "RZ-104-11"
+   *
+   * {string} systemType - e.g., "RZ-104-11"
+   * {string} position - e.g., "Horizontal" or "Vertical"
+   * {number} branch - Number of branches (default 1)
    */
-  async getParameterRanges(systemType) {
+  async getParameterRanges(systemType, position = null, branch = 1) {
     try {
-      const response = await fetch(`${API_BASE_URL}/system/${systemType}/ranges`);
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (position) {
+        params.append('position', position. toLowerCase());
+      }
+      if (branch && branch >= 1) {
+        params.append('branch', branch);
+      }
+
+      const queryString = params.toString();
+      const url = `${API_BASE_URL}/system/${systemType}/ranges${queryString ? '?' + queryString :  ''}`;
+
+      const response = await fetch(url);
       const data = await response.json();
       return {
         success: true,
         ranges: data.ranges,
-        systemType: data.system_type
+        systemType:  data.system_type
       };
     } catch (error) {
       console.error('Failed to get parameter ranges:', error);
+      return {
+        success:  false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get KillData table for pathogens
+   * GET /killData
+   */
+  async getKillData() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/killdata`);
+      const data = await response.json();
+      return {
+        success: true,
+        status: data.status,
+        table_text: data.table_text,
+        rows: data.rows,
+        columns: data.columns
+      };
+    } catch (error) {
+      console.error('Failed to get KillData:', error);
       return {
         success: false,
         error: error.message
       };
     }
   }
+
+
+  /**
+   * Get data for Dechlorination
+   * POST /Dechlorination
+   */
+  async getDechlorination(chlorine_in, ozone_in, red = 300) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/Dechlorination`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "red": red,
+          "ozone_in": ozone_in,
+          "chlorine_in": chlorine_in,
+        })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Dechlorination calculation failed');
+      }
+
+      return {
+        success: true,
+        status: data.status,
+        ozone_out: data.ozone_out,
+        chlorine_out: data.chlorine_out
+      };
+    } catch (error) {
+      console.error('Failed to get Dechlorination data:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get chart sensitivity data
+   * POST /charts/sensitivity
+   * 
+   * {string} systemType - e.g., "RZ163-11"
+   * {string} chartType - e.g., "uvt", "flow", "drive"
+   * {number} numPoints - Number of data points, e.g., 20
+   * {string} position - e.g., "Horizontal" or "Vertical"
+   * {string} lampType - e.g., "Regular"
+   * {object} powerSettings - e.g., { all_lamps: 100.0 }
+   * {object} efficiencySettings - e.g., { all_lamps: 80.0 }
+   * {object} range - Range object with min and max, e.g., { min: 40, max: 97 }
+   * {number} flowRate - Flow rate for "drive" chart type
+   */
+  async getChartSensitivity(
+    systemType,
+    chartType,
+    numPoints,
+    position,
+    lampType,
+    powerSettings,
+    efficiencySettings,
+    range,
+    flowRate
+  ) {
+    try {
+      let requestBody;
+
+      if (chartType === 'drive') {
+        // For "drive" chart: use fixed_params with flow, null for power/efficiency
+        requestBody = {
+          system_type: systemType,
+          chart_type: chartType,
+          fixed_params: {
+            flow: flowRate
+          },
+          num_points: numPoints,
+          position: position,
+          lamp_type: lampType,
+          power_settings: null,
+          efficiency_settings: null
+        };
+      } else {
+        // For other charts (uvt, flow, etc.): use power_settings and efficiency_settings
+        requestBody = {
+          system_type: systemType,
+          chart_type: chartType,
+          num_points: numPoints,
+          position: position,
+          lamp_type: lampType,
+          power_settings: powerSettings,
+          efficiency_settings: efficiencySettings,
+          [`${chartType}_range`]: range
+        };
+      }
+
+      const response = await fetch(`${API_BASE_URL}/charts/sensitivity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Chart sensitivity calculation failed');
+      }
+
+      return {
+        success: true,
+        data: data
+      };
+    } catch (error) {
+      console.error('Failed to get chart sensitivity:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /*
+     Get flow rate for target dose
+     POST /flow-for-dose
+
+   */
+  async flowForDose({
+    systemType,
+    targetDose,
+    uvt254,
+    uvt215,
+    d1Log,
+    position,
+    powerSettings = {},
+    efficiencySettings = {},
+    tolerance = 0.1,
+    override = false
+  }) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/flow-for-dose`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          system_type: systemType,
+          target_dose: targetDose,
+          uvt_254: uvt254,
+          uvt_215: uvt215,
+          d1_log: d1Log,
+          position: position,
+          power_settings: powerSettings,
+          efficiency_settings: efficiencySettings,
+          tolerance: tolerance,
+          override: override
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Flow for dose calculation failed');
+      }
+
+      return {
+        success: true,
+        flowRate: data.flow_rate,
+        achievedDose: data.achieved_dose,
+        targetDose: data.target_dose,
+        details: data.details
+      };
+    } catch (error) {
+      console.error('Failed to get flow for dose:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
 
   /**
    * Main calculation method
@@ -138,8 +426,10 @@ class APIService {
       const requestBody = {
         ...params,
         Model: params.Model,
-        Module: params.Module
+        Module: params.Module,
+        override: params.override || false  // Add override with default false
       };
+
 
       const response = await fetch(`${API_BASE_URL}/calculate`, {
         method: 'POST',
@@ -148,6 +438,7 @@ class APIService {
         },
         body: JSON.stringify(requestBody)
       });
+
 
       // Get response text first
       const responseText = await response.text();

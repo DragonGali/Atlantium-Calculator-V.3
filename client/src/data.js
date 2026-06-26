@@ -1,16 +1,41 @@
 const data = {
 
-    options: [
-        'Full Range UV Systems',
-        'Municipal Market under the EPA',
-        'Decholoration | Ozone Decomposition'
-    ],
+    // UVT215 auto-calculation coefficients (from C library)
+    // Formula: UVT215 = UVT215_A * exp(UVT215_B * UVT254)
+    // Used in Standard (Marketing) mode to auto-calculate UVT215 from UVT254
+    UVT215_COEFFICIENTS: {
+        A: 0.2804,
+        B: 0.0609
+    },
+
+    options: {
+        labels: [
+            'Full Range HOD UV Systems',
+            'Municipal Market under the EPA',
+            'Dechlorination | Ozone Decomposition'
+        ],
+
+        values: [
+            'Full Range',
+            'Municipal EPA',
+            'Dechlorination'
+        ]
+    },
 
     HODButtons: ['Regular', 'Ozone Free', 'VUV'],
 
-    CalculatorVersionButtons: ['Developer', 'Marketing'],
+    // Mapping from button label to lamp type value (as stored in backend)
+    LampTypeMapping: {
+        'Regular': 'Regular',
+        'Ozone Free': 'OF',
+        'VUV': 'VUV'
+    },
 
-    PlotFiguresButtons: ['PlotPlot Red = f(UVT)', 'Plot Red = f(Flow)', 'Plot Red = f(Rel.Drive)'],
+    CalculatorVersionButtons: ['Developer', 'Standard'],
+
+    DeveloperPassword: 'Atlantium',
+
+    PlotFiguresButtons: ['PlotPlot RED = f(UVT)', 'Plot RED = f(Flow)', 'Plot RED = f(Rel.Drive)'],
 
     Specifications: {
         top: [
@@ -34,11 +59,24 @@ const data = {
     },
 
     Results: [
-        {fieldName: "Reduction Equivalent Dose (RED):", value: 67.6, scale: "[mj/cm²]"},
-        {fieldName: "Head Loss (on HOD Systems Only):", value: 0.03, options: [{value: "[m/H₂O]", label: "[m/H₂O]"}, {value: "[cm/H₂O]", label: "[cm/H₂O]"}, {value: "[in/H₂O]", label: "[in/H₂O]"}, {value: "[bar]", label: "[bar]"}, {value: "[PSI]", label: ["PSI"]}]},
+        {fieldName: "Reduction Equivalent Dose (RED):", value: 67.6, scale: "[mJ/cm²]"},
+        {fieldName: "Head Loss (on UV HOD Systems Only):", value: 0.03, options: [{value: "[m/H₂O]", label: "[m/H₂O]"}, {value: "[cm/H₂O]", label: "[cm/H₂O]"}, {value: "[in/H₂O]", label: "[in/H₂O]"}, {value: "[bar]", label: "[bar]"}, {value: "[PSI]", label: ["PSI"]}]},
         {fieldName: "Maximum Electrical Power:", value: 1.705, scale: "[kW]"},
-        {fieldName: "Est. avg. lamp power consumption:", value: 1.534, scale: "[kW]"}
+        {fieldName: "Power Consumption at 90% Drive", value: 1.534, scale: "[kW]"}
     ],
+
+    HeadLossMultipliers: {
+        "[m/H₂O]" : 0.01,        // ✅ cm to m: divide by 100
+        "[cm/H₂O]" : 1,          // ✅ cm to cm: no conversion
+        "[in/H₂O]" : 0.393701,   // ✅ cm to inches: 1 cm = 0.393701 in
+        "[bar]" : 0.000980665,   // ✅ cm H₂O to bar
+        "[PSI]" : 0.01422334     // ✅ cm H₂O to PSI
+    },
+
+    FlowRateMultiplyer: {
+        "m3/h" : 1,
+        "US GPM" : 4.403
+    },
 
     PathogenReduction: {
         treeView: {

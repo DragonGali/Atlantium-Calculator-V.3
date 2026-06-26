@@ -31,19 +31,18 @@ import Specifications from './Components/Specifications.jsx'
 import Results from './Components/Results.jsx'
 import PathogenReduction from './Components/PathogenReduction.jsx'
 import PathogenInactivation from './Components/PathogenInactivation.jsx'
-import Dichlorination from './Components/Dichlorination.jsx'
+import Dechlorination from './Components/Dechlorination.jsx'
 import TableView from './Components/TableView.jsx'
 import DraggableWindow from './Components/DraggableWindow.jsx'
 import PasswordBox from './Components/PasswordBox.jsx'
 import SimpleChart from './Components/SimpleChart.jsx'
-
-import useAppState from './hooks/useAppState';
+import FlowDosePrompt from './Components/FlowDosePrompt.jsx'
 
 
 // =======================
 // Main App Component
 // =======================
-const App = ({appState, updateState}) =>  {
+const App = ({appState, updateState, getChartSensitivity, isOutOfOperationalRange}) =>  {
 
   /**
    * Track window size so child components
@@ -53,11 +52,57 @@ const App = ({appState, updateState}) =>  {
     width: window.innerWidth,
     height: window.innerHeight
   });
-  
-  const [unlockAll, setUnlockAll] = useState(true); // Developer mode toggle (unlocks extra features). 
+  const unlockAll = appState?.calculatorMode === 'Developer';
   const [openPasswordBox, setOpenPasswordBox] = useState(false); // Controls whether the password box modal is shown.
   const [openChart, setOpenChart] = useState(false); // Controls whether the chart draggable window is shown. 
   const [fullTableOpened, setFullTableOpened] = useState(false);//Controls whether the full pathogen table window is open.
+  const [openDosePrompt, setOpenDosePrompt] = useState(false);
+
+  // Helper to toggle unlock mode
+  const setUnlockAll = (value) => {
+    const mode = value ? 'Developer' :  'Marketing';
+    updateState({ calculatorMode: mode });
+  };
+
+  const parseFullKillDataToTableFormat = (tableText) => {
+  const lines = tableText.trim().split('\n');
+  const headers = lines[0].split('\t');
+
+  const tableData = lines.slice(1)
+    .map(line => {
+      const cells = line.split('\t');
+      const name = cells[0]?.trim();
+      const obj = { name };
+
+      // Include all numeric log columns
+      for (let i = 1; i < headers.length - 1; i++) {
+        const logValue = headers[i].trim();
+        if (!isNaN(parseFloat(logValue))) {
+          const val = cells[i]?.trim();
+          if (val) {
+            const key = `${logValue}Log`.replace('.', 'PointFive');
+            if (!isNaN(val)) {
+              let num = parseFloat(val);
+              // Limit to 4 total characters (including decimal point)
+              const str = num.toFixed(3); // ensure precision
+              obj[key] = parseFloat(
+                str.length > 4 ? str.slice(0, 4) : str
+              );
+            } else {
+              obj[key] = val;
+            }
+          }
+        }
+      }
+
+      // Skip category rows like "Bacteria"
+      const hasData = Object.keys(obj).length > 1;
+      return hasData ? obj : null;
+    })
+    .filter(Boolean);
+
+  return tableData;
+};
 
   // Window resize handling
   useEffect(() => {
@@ -67,9 +112,8 @@ const App = ({appState, updateState}) =>  {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+
   }, []);
-
-
 
 
   // WhatsApp Contact Icon
@@ -83,7 +127,15 @@ const App = ({appState, updateState}) =>  {
   return ( 
     <div className="App">
       <div id="flex-container">
-        <img id="atlantium-img" src="/AtlantiumLogo_Long.png"/>
+        <div className="banner-container">
+          <a href="https://www.atlantium.com" target="_blank" rel="noopener noreferrer">
+            <img id="atlantium-img" src="/AtlantiumLogo_Long.png" />
+          </a>
+          <div className="user-info-banner">
+            Logged in as: <strong>{appState?.username}</strong> ({appState?.role})
+          </div>
+        </div>
+
         <div className="systems-container">
 
           {/* Row 1, Column 1 */}
@@ -92,6 +144,7 @@ const App = ({appState, updateState}) =>  {
               id="choose-application" 
               appState={appState} 
               updateState={updateState}
+              unlockAll={unlockAll}
             />
             <HODSystem 
               id="hod-system" 
@@ -109,9 +162,11 @@ const App = ({appState, updateState}) =>  {
             height={size.height}
             className="column-2"
             unlockAll={unlockAll}
+            isOutOfOperationalRange={isOutOfOperationalRange}
             style={{ gridRow: "1", gridColumn: "2" }}
             updateState={updateState}
             appState={appState}
+            openDosePrompt={() => {setOpenDosePrompt(true);}}
           />
 
           {/* Row 1, Column 3 */}
@@ -132,11 +187,15 @@ const App = ({appState, updateState}) =>  {
               id="calculator-version" 
               unlockAll={setUnlockAll} 
               openPasswordBox={() => setOpenPasswordBox(true)}
+              updateState={updateState}
+              appState={appState}
             />
             <PlotFigures 
               id="plot-figures" 
               unlockAll={unlockAll} 
               openChart={() => setOpenChart(true)}
+              updateState={updateState}
+              getChartSensitivity={getChartSensitivity}
             />
           </div>
 
@@ -158,8 +217,10 @@ const App = ({appState, updateState}) =>  {
               width={size.width}
               height={size.height}
               unlockAll={unlockAll}
+              appState={appState}
+              updateState={updateState}
             />
-            <Dichlorination id="dichlorination" />
+            <Dechlorination id="Dechlorination" appState={appState} updateState={updateState}/>
           </div>
 
         </div>
@@ -167,9 +228,13 @@ const App = ({appState, updateState}) =>  {
 
       {/* Footer */}
       <footer className="footer">
-        <p id="creator-names">Gali Kertser, Mike Kertser</p>
-        <p id="version">UV Dose Calculator v.11.20</p>
-        <a 
+      <p id="creator-names">
+        <a href="https://www.linkedin.com/in/gali-kertser/" target="_blank" rel="noopener noreferrer">Gali Kertser</a> 
+        <a href="https://www.linkedin.com/in/mike-kertser/" target="_blank" rel="noopener noreferrer"> ,Mike Kertser</a>
+      </p>
+
+        <p id="version">UV Dose Calculator v{appState?.api_version || "?"} | RED Library v{appState?.library_version || "?"}</p>
+        <a
           href="https://wa.me/0546490221" 
           className="whatsapp-link"
           target="_blank"
@@ -183,9 +248,7 @@ const App = ({appState, updateState}) =>  {
       {/* Password Modal */}
       {openPasswordBox && (
         <PasswordBox 
-          onClose={() => setOpenPasswordBox(false)} 
-          onPasswordCorrect={() => setUnlockAll(true)}
-          appState={appState}
+          onClose={() => setOpenPasswordBox(false)}
           updateState={updateState}
         />
       )}
@@ -193,8 +256,6 @@ const App = ({appState, updateState}) =>  {
       {/* Full Pathogen Table Window */}
       {fullTableOpened && (
         <DraggableWindow
-          height={Math.max(200, Math.min(600, size.height * 0.6))}
-          width={Math.max(500, Math.min(1000, size.width * 0.66))}
           content={
             <div>
               <div
@@ -204,7 +265,7 @@ const App = ({appState, updateState}) =>  {
                 }}
               >
                 <div className="app-pathogen-type-header">Pathogen Type</div>
-                {Array.from({ length: 10 }, (_, i) => (
+                {Array.from({ length: 11 }, (_, i) => (
                   <div key={i} className="app-log-header">
                     {`${1 + i * 0.5}-Log`}
                   </div>
@@ -212,7 +273,8 @@ const App = ({appState, updateState}) =>  {
                 
               </div>
 
-              <TableView data={data.PathogenReduction.FullTable.tableData} />
+              <TableView data={parseFullKillDataToTableFormat(appState?.killData?.["table_text"])} appState={appState}
+          updateState={updateState} />
             </div>
           }
           title={data.PathogenReduction.FullTable.title}
@@ -226,23 +288,17 @@ const App = ({appState, updateState}) =>  {
           height={Math.max(200, Math.min(600, size.height * 0.6))}
           width={Math.max(500, Math.min(1000, size.width * 0.5))}
           onClose={() => setOpenChart(false)}
-          title="Charts"
+          title={appState?.chartSensitivity?.chart_type}
           content={
             <SimpleChart
-              labels={['Jan', 'Feb', 'Mar', 'Apr']}
-              datasets={[
-                { label: 'Apples', data: [3, 2, 5, 4] },
-                { label: 'Oranges', data: [1, 3, 2, 6] },
-                { label: 'Bananas', data: [4, 1, 3, 2] }
-              ]}
-              type="line"
-              title="Fruit Sales Over Time"
-              xTitle="Months"
-              yTitle="Quantity"
+              chartData={appState?.chartSensitivity}
+              key={appState?.chartSensitivity?.chart_type}
             />
           }
         />
       )}
+
+      {openDosePrompt && <FlowDosePrompt onClose={() => {setOpenDosePrompt(false);}} appState={appState} updateState={updateState}/>}
     </div>
   )
 }

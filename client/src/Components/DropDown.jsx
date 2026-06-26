@@ -73,6 +73,7 @@ const Dropdown = ({
     <div className="dropdown-wrapper">
       <div 
         className={`dropdown ${isActive ? 'active' : ''}`}
+        onMouseLeave={() => {setIsActive(false)}}
       >
         {/* Label */}
         <span
