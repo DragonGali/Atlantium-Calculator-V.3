@@ -29,7 +29,7 @@
 label {
   display: flex;
   cursor: pointer;
-  font-family: "Inter-Light";
+  font-family: "Poppins-Light";
   position: relative;
   font-size: var(--font-regular);
   color: var(--text);

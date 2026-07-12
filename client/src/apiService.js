@@ -6,7 +6,12 @@
  */
 
 import config from '../config.json';
+import localData from './data';
 const API_BASE_URL = config.API_BASE_URL;
+
+// Toggle this to `false` to re-enable real network requests.
+// Set to `true` while the backend is unavailable to avoid fetch() calls.
+const OFFLINE_MODE = true;
 
 class APIService {
   /**
@@ -14,6 +19,14 @@ class APIService {
    * GET /health
    */
   async checkHealth() {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        healthy: true,
+        data: { status: 'healthy', calculator_initialized: true }
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/health`);
       const data = await response.json();
@@ -38,6 +51,14 @@ class APIService {
    * Returns API server version and RED library version
    */
   async getVersion() {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        api_version: 'offline',
+        library_version: 'offline'
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/version`);
       const data = await response.json();
@@ -63,6 +84,16 @@ class APIService {
    * {string} password - The password
    */
   async login(username, password) {
+    if (OFFLINE_MODE) {
+      // Return a permissive mock user so UI can operate when offline
+      return {
+        success: true,
+        role: 'Admin',
+        calculator_type: 'Standard',
+        message: 'Offline mock login'
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
@@ -113,6 +144,13 @@ class APIService {
    *                        Marketing users see only production systems
    */
   async getSupportedSystems(type, role) {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        systems: []
+      };
+    }
+
     try {
       const params = new URLSearchParams();
       if (type) params.append('type', type);
@@ -144,6 +182,15 @@ class APIService {
    * @returns {Object} Lamp info including power, count, and available types
    */
   async getLampInfo(systemType) {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        power: 100,
+        count: 1,
+        types: ['Regular']
+      };
+    }
+
     try {
       const url = `${API_BASE_URL}/system/${systemType}/lamp`;
       const response = await fetch(url);
@@ -178,6 +225,14 @@ class APIService {
    * {number} branch - Number of branches (default 1)
    */
   async getParameterRanges(systemType, position = null, branch = 1) {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        ranges: {},
+        systemType
+      };
+    }
+
     try {
       // Build query parameters
       const params = new URLSearchParams();
@@ -212,6 +267,21 @@ class APIService {
    * GET /killData
    */
   async getKillData() {
+    if (OFFLINE_MODE) {
+      // Build a minimal TSV from local data to keep client components functional
+      const rows = localData.PathogenReduction.tableView.tableData || [];
+      const header = ['Name', '1', '2', '3', 'Category'].join('\t');
+      const body = rows.map(r => `${r.name}\t${r.oneLog}\t${r.twoLog}\t${r.threeLog}\tBacteria`).join('\n');
+      const table_text = `${header}\n${body}`;
+      return {
+        success: true,
+        status: 'ok',
+        table_text,
+        rows: rows.length,
+        columns: 5
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/killdata`);
       const data = await response.json();
@@ -237,6 +307,15 @@ class APIService {
    * POST /Dechlorination
    */
   async getDechlorination(chlorine_in, ozone_in, red = 300) {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        status: 'ok',
+        ozone_out: ozone_in,
+        chlorine_out: chlorine_in
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/Dechlorination`, {
         method: 'POST',
@@ -296,6 +375,10 @@ class APIService {
     range,
     flowRate
   ) {
+    if (OFFLINE_MODE) {
+      return { success: true, data: { x: [], y: [] } };
+    }
+
     try {
       let requestBody;
 
@@ -371,6 +454,16 @@ class APIService {
     tolerance = 0.1,
     override = false
   }) {
+    if (OFFLINE_MODE) {
+      return {
+        success: true,
+        flowRate: 0,
+        achievedDose: 0,
+        targetDose: targetDose,
+        details: {}
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/flow-for-dose`, {
         method: 'POST',
@@ -430,6 +523,13 @@ class APIService {
         override: params.override || false  // Add override with default false
       };
 
+
+      if (OFFLINE_MODE) {
+        return {
+          success: true,
+          data: { message: 'Offline mock calculation', results: {} }
+        };
+      }
 
       const response = await fetch(`${API_BASE_URL}/calculate`, {
         method: 'POST',
